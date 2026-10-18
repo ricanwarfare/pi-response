@@ -121,6 +121,19 @@ func TestSavedKeyRequirement(t *testing.T) {
 	}
 }
 
+func TestSessionToolSelection(t *testing.T) {
+	for _, selector := range []string{"--continue", "-c", "--resume", "-r", "--session", "--session-id", "--fork"} {
+		if !usesSessionTools([]string{selector, "synthetic-session"}) {
+			t.Fatalf("session selector %s would override restored tools", selector)
+		}
+	}
+	for _, args := range [][]string{nil, {"--", "--continue"}, {"--system-prompt", "--resume"}, {"--name", "--session"}, {"--tools", "--fork"}} {
+		if usesSessionTools(args) {
+			t.Fatalf("literal or option value %q must keep portable defaults", args)
+		}
+	}
+}
+
 func TestCredentialPermissionsAndReplacement(t *testing.T) {
 	home := t.TempDir()
 	path := filepath.Join(home, "ollama-cloud.key")

@@ -423,6 +423,27 @@ func subcommand(arg string) bool {
 	return false
 }
 
+func argumentTakesValue(arg string) bool {
+	switch arg {
+	case "--mode", "--provider", "--model", "--api-key", "--system-prompt", "--append-system-prompt", "--name", "-n", "--session", "--session-id", "--fork", "--session-dir", "--models", "--tools", "-t", "--exclude-tools", "-xt", "--thinking", "--export", "--extension", "-e", "--skill", "--prompt-template", "--theme", "--use-theme", "--tui-mode":
+		return true
+	}
+	return false
+}
+
+func usesSessionTools(args []string) bool {
+	for i := 0; i < len(args) && args[i] != "--"; i++ {
+		switch args[i] {
+		case "--continue", "-c", "--resume", "-r", "--session", "--session-id", "--fork":
+			return true
+		}
+		if argumentTakesValue(args[i]) && i+1 < len(args) {
+			i++
+		}
+	}
+	return false
+}
+
 func needsSavedKey(args []string) bool {
 	// Informational commands do not authenticate. Option values and literal
 	// messages can contain these same words without changing that decision.
@@ -430,8 +451,8 @@ func needsSavedKey(args []string) bool {
 		switch args[i] {
 		case "--help", "-h", "--version", "-v":
 			return false
-		case "--mode", "--provider", "--model", "--api-key", "--system-prompt", "--append-system-prompt", "--name", "-n", "--session", "--session-id", "--fork", "--session-dir", "--models", "--tools", "-t", "--exclude-tools", "-xt", "--thinking", "--export", "--extension", "-e", "--skill", "--prompt-template", "--theme", "--use-theme", "--tui-mode":
-			if i+1 < len(args) {
+		default:
+			if argumentTakesValue(args[i]) && i+1 < len(args) {
 				i++
 			}
 		}
@@ -668,7 +689,8 @@ func run(args []string) error {
 	defaults := []string{"--offline", "--no-approve", "--no-extensions", "--no-mcp", "--no-skills", "--no-prompt-templates", "--no-themes", "--no-context-files"}
 	defaults = append(defaults, "--extension", filepath.Join(runtime, "portable", "triage.mjs"))
 	defaults = append(defaults, "--extension", filepath.Join(runtime, "portable", "web", "index.ts"))
-	if !hasTools {
+	// An explicit allowlist suppresses Pi 1.3.0 session tool restoration.
+	if !hasTools && !usesSessionTools(forwarded) {
 		defaults = append(defaults, "--tools", "read,bash,grep,find,ls,web_search,url_context")
 	}
 	if len(forwarded) > 0 && subcommand(forwarded[0]) {

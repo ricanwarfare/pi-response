@@ -164,7 +164,9 @@ To enable editing on Windows:
 .\pi-response.exe --tools read,powershell,edit,write,grep,find,ls
 ```
 
-An explicit `--tools` list replaces the portable default. Pi also accepts `--no-tools` and `--exclude-tools`. Tool selection is not an operating-system security boundary.
+These defaults apply to ordinary fresh launches. `--continue`/`-c`, `--resume`/`-r`, `--session`, `--session-id`, and `--fork` defer tool selection to Pi so existing sessions restore their active tools. If no saved tool state is available (for example, `--continue` with no previous session or an unknown `--session-id`), Pi uses upstream defaults, which can include editing tools; use an explicit allowlist when the tool set must be fixed. Relative `--tools +name,-name` entries adjust the restored tools (or upstream defaults for a fresh session). Web access still resets to off.
+
+An explicit `--tools` list of names replaces the portable default or restored tool set. Pi also accepts `--no-tools` and `--exclude-tools`. Tool selection is not an operating-system security boundary.
 
 On Linux, use `--tools read,bash,edit,write,grep,find,ls` to enable the equivalent shell and editing tools.
 
@@ -285,7 +287,9 @@ For a local/private endpoint, add it to the portable `agent/models.json` followi
 | Upstream Pi | 1.3.0 |
 | Search tools | ripgrep 15.2.0, fd 10.5.0 |
 | Default connection | Ollama Cloud / DeepSeek 4.1 Flash |
-| Wrapper | 0.7.1 — case-scoped analysis and evidence-bound reports |
+| Wrapper source | 0.7.2 — prepared, unpublished; Pi 1.3.0 session-tool compatibility |
+
+The latest published wrapper is 0.7.1. The 0.7.2 source preparation retains the existing Pi 1.3.0 archive URLs/hashes and adds the release provenance from [PR #1](https://github.com/ricanwarfare/pi-response/pull/1). See the [compatibility review](docs/PI_1.3.0_REVIEW.md) for session tools, provider changes, and sharing behavior.
 
 Automated tests cover both launchers and actual tools using a local fake model, including default model selection and saved-key Bearer authentication. Linux tests also exercise a real pseudo-terminal for hidden input, replacement, and cancellation. No real provider account is used. Live Ollama account access and broader interactive TUI behavior still need validation. ARM64, macOS, and older operating systems are not validated targets.
 
@@ -313,6 +317,7 @@ node .\tests\web-runtime.mjs
 node .\tests\triage-runtime.mjs
 node .\tests\triage-analysis-smoke.mjs
 node .\tests\runtime-smoke.mjs
+node .\tests\session-tools-smoke.mjs
 ```
 
 Windows builds require PowerShell 7 and the .NET Framework C# compiler; tests also need Node.js 22+. A .NET SDK is not required.
@@ -330,6 +335,7 @@ node tests/web-runtime.mjs
 node tests/triage-runtime.mjs
 node tests/triage-analysis-smoke.mjs
 node tests/runtime-smoke.mjs
+node tests/session-tools-smoke.mjs
 ```
 
 Linux builds use Go 1.27.2 and Python 3.10+; tests also need Node.js 22+. Neither platform needs a checkout of upstream Pi or npm dependencies. Both builds download checksum-pinned official archives, with cached archives available for subsequent offline builds.
