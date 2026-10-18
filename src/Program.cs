@@ -96,15 +96,26 @@ internal static class Program
             ((apiKey as string) == "${OLLAMA_API_KEY}" || (apiKey as string) == "$OLLAMA_API_KEY");
     }
 
+    private static readonly string[] ValueOptions = new[] { "--mode", "--provider", "--model", "--api-key", "--system-prompt", "--append-system-prompt", "--name", "-n", "--session", "--session-id", "--fork", "--session-dir", "--models", "--tools", "-t", "--exclude-tools", "-xt", "--thinking", "--export", "--extension", "-e", "--skill", "--prompt-template", "--theme", "--use-theme", "--tui-mode" };
+
+    private static bool UsesSessionTools(List<string> args)
+    {
+        for (var i = 0; i < args.Count && args[i] != "--"; i++)
+        {
+            if (Array.IndexOf(new[] { "--continue", "-c", "--resume", "-r", "--session", "--session-id", "--fork" }, args[i]) >= 0) return true;
+            if (Array.IndexOf(ValueOptions, args[i]) >= 0 && i + 1 < args.Count) i++;
+        }
+        return false;
+    }
+
     private static bool NeedsSavedKey(List<string> args)
     {
         // These commands do not authenticate. Skip option values so a system
         // prompt such as "--version" is still passed through with credentials.
-        var valueOptions = new[] { "--mode", "--provider", "--model", "--api-key", "--system-prompt", "--append-system-prompt", "--name", "-n", "--session", "--session-id", "--fork", "--session-dir", "--models", "--tools", "-t", "--exclude-tools", "-xt", "--thinking", "--export", "--extension", "-e", "--skill", "--prompt-template", "--theme", "--use-theme", "--tui-mode" };
         for (var i = 0; i < args.Count && args[i] != "--"; i++)
         {
             if (Array.IndexOf(new[] { "--help", "-h", "--version", "-v" }, args[i]) >= 0) return false;
-            if (Array.IndexOf(valueOptions, args[i]) >= 0 && i + 1 < args.Count) i++;
+            if (Array.IndexOf(ValueOptions, args[i]) >= 0 && i + 1 < args.Count) i++;
         }
         return true;
     }
@@ -327,7 +338,8 @@ internal static class Program
             var defaults = new List<string> { "--offline", "--no-approve", "--no-extensions", "--no-mcp", "--no-skills", "--no-prompt-templates", "--no-themes", "--no-context-files" };
             defaults.AddRange(new[] { "--extension", Path.Combine(runtime, "portable", "triage.mjs") });
             defaults.AddRange(new[] { "--extension", Path.Combine(runtime, "portable", "web", "index.ts") });
-            if (!hasTools) defaults.AddRange(new[] { "--tools", "read,powershell,grep,find,ls,web_search,url_context" });
+            // An explicit allowlist suppresses Pi 1.3.0 session tool restoration.
+            if (!hasTools && !UsesSessionTools(forwarded)) defaults.AddRange(new[] { "--tools", "read,powershell,grep,find,ls,web_search,url_context" });
             // Upstream dispatches subcommands by args[0]; flags must not precede them.
             if (forwarded.Count > 0 && Array.IndexOf(new[] { "auth", "install", "remove", "uninstall", "update", "list", "config", "mcp" }, forwarded[0]) >= 0) defaults.Clear();
             defaults.AddRange(forwarded);

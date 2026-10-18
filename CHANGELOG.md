@@ -4,6 +4,15 @@ Wrapper versions are independent of upstream Pi versions.
 
 ## Unreleased
 
+## 0.7.2 — prepared, unpublished
+
+- Reviewed upstream Pi 1.3.0 and PR #1. Added release identity/timestamp provenance for both platforms; existing Pi archive URLs, SHA-256 hashes, search utilities, and unmodified pi-web-search 1.7.0 are unchanged. This is a compatibility/provenance refresh, not a Pi version upgrade.
+- Windows and Linux now defer tool selection to Pi when continuing, resuming, opening, or forking sessions, including exact session IDs. Pi restores active tools and applies relative --tools adjustments; explicit tool allowlists and no-tools options still take precedence. Fresh ordinary sessions retain portable defaults; a missing exact session ID uses upstream defaults. Web access still resets to off.
+- Added launcher regression coverage and a fake-provider packaged-runtime test for restored tools, relative adjustments, forks, explicit restrictions, and disabled web tools.
+- Documented Kimi Code Chat Completions /v1 overrides, qualified model selection, and /share destinations. The Ollama Cloud preset already uses /v1 and needs no migration; existing portable configuration is preserved.
+
+No tag or release has been published for this preparation. Live provider access and both Ubuntu CI targets remain required validation before publication.
+
 ## 0.7.1 — 2026-10-16
 
 - Added case-path enforcement for inspection tools during /analyze, including omitted search paths, aliases, special files, and outside-case model requests. This is an application guard, not an OS sandbox.

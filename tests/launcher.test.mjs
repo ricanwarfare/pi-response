@@ -113,6 +113,17 @@ test('explicit tools replace defaults, and subcommands keep first position', () 
   assert.ok(!run(['--no-tools']).actualArgs.includes('--tools'));
 });
 
+test('session selectors preserve upstream tool restoration and explicit overrides', () => {
+  for (const selector of ['--continue', '-c', '--resume', '-r', '--session', '--session-id', '--fork']) {
+    const args = [selector, 'synthetic-session'];
+    assert.ok(!run(args).actualArgs.includes('--tools'), selector);
+    assert.deepEqual(run([...args, '--tools', '+read,-write']).actualArgs.slice(-2), ['--tools', '+read,-write']);
+  }
+  for (const args of [['--', '--continue'], ['--system-prompt', '--resume'], ['--name', '--session']]) {
+    assert.ok(run(args).actualArgs.includes('read,powershell,grep,find,ls,web_search,url_context'), args.join(' '));
+  }
+});
+
 test('info and notices require no extraction', () => {
   const home = join(scratch, 'info only');
   const info = run(['--response-info'], { home });

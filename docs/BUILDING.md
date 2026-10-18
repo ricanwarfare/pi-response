@@ -21,6 +21,7 @@ node .\tests\web-runtime.mjs
 node .\tests\triage-runtime.mjs
 node .\tests\triage-analysis-smoke.mjs
 node .\tests\runtime-smoke.mjs
+node .\tests\session-tools-smoke.mjs
 ```
 
 Output is `dist/pi-response.exe`, `dist/pi-response.exe.sha256`, and `dist/pi-response.exe.build.json`. The manifest records the wrapper version, source commit when available, `sourceDirty` (Boolean, or null outside Git), dependency pins, and payload/executable hashes. It is provenance information, not a signature or exhaustive SBOM. Builds are not guaranteed to be bit-for-bit reproducible across machines.
@@ -50,6 +51,7 @@ node tests/web-runtime.mjs
 node tests/triage-runtime.mjs
 node tests/triage-analysis-smoke.mjs
 node tests/runtime-smoke.mjs
+node tests/session-tools-smoke.mjs
 ```
 
 Outputs are `dist/pi-response-linux-x64`, its `.sha256`, and its `.build.json` manifest. Build downloads use exact pins in `upstream-linux-release.json`. The script validates archive paths/types, assembles a deterministic compressed payload, and embeds it with presets and notices in a statically linked Go launcher. Pi inside still needs compatible glibc Linux and Bash. The target needs no compiler or package manager.
@@ -96,6 +98,8 @@ To update this package, review the exact npm release and source, verify the down
 5. Build and run both test commands.
 
 Investigate checksum mismatches rather than bypassing validation.
+
+The prepared 0.7.2 source incorporates the provenance-only [PR #1](https://github.com/ricanwarfare/pi-response/pull/1) and the [Pi 1.3.0 compatibility review](PI_1.3.0_REVIEW.md). Run `node tests/session-tools-smoke.mjs` after building on each platform to verify persisted tool selection against the actual packaged Pi. This preparation does not publish a release.
 
 ## Publish a release
 
