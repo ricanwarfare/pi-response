@@ -4,7 +4,7 @@ Pi Response is an independent Incident Response distribution fork of the [Pi cod
 
 | Software | Version | Source | License |
 | --- | --- | --- | --- |
-| Pi coding agent | 1.3.0 | [earendil-works/pi](https://github.com/earendil-works/pi) | MIT; retained in [NOTICE.txt](NOTICE.txt) |
+| Pi coding agent | 1.4.0 | [earendil-works/pi](https://github.com/earendil-works/pi) | MIT; retained in [NOTICE.txt](NOTICE.txt) |
 | ripgrep | 15.2.0 | [BurntSushi/ripgrep](https://github.com/BurntSushi/ripgrep) | MIT or Unlicense; retained under `runtime/<hash>/tools/rg/` |
 | fd | 10.5.0 | [sharkdp/fd](https://github.com/sharkdp/fd) | MIT or Apache-2.0; retained under `runtime/<hash>/tools/fd/` |
 | Go runtime (Linux launcher) | CI builds with Go 1.27.2 | [golang/go](https://github.com/golang/go) | BSD-3-Clause; retained in [GO-LICENSE.txt](assets/licenses/GO-LICENSE.txt) and Linux runtime `licenses/` |
