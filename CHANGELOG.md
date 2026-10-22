@@ -4,6 +4,8 @@ Wrapper versions are independent of upstream Pi versions.
 
 ## Unreleased
 
+- Update bundled Pi from 1.3.0 to 1.4.0; retain portable launchers, IR tools, provider settings, and web controls.
+
 ## 0.7.2 — prepared, unpublished
 
 - Reviewed upstream Pi 1.3.0 and PR #1. Added release identity/timestamp provenance for both platforms; existing Pi archive URLs, SHA-256 hashes, search utilities, and unmodified pi-web-search 1.7.0 are unchanged. This is a compatibility/provenance refresh, not a Pi version upgrade.

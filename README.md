@@ -284,7 +284,7 @@ For a local/private endpoint, add it to the portable `agent/models.json` followi
 | Platforms | Windows x64; Linux x64 (Ubuntu 22.04/24.04 CI) |
 | Windows prerequisites | .NET Framework 4.8 and Windows PowerShell |
 | Linux prerequisites | Bash, compatible glibc Linux, executable filesystem |
-| Upstream Pi | 1.3.0 |
+| Upstream Pi | 1.4.0 |
 | Search tools | ripgrep 15.2.0, fd 10.5.0 |
 | Default connection | Ollama Cloud / DeepSeek 4.1 Flash |
 | Wrapper source | 0.7.2 — prepared, unpublished; Pi 1.3.0 session-tool compatibility |
