@@ -223,9 +223,11 @@ test('seeds the Ollama Cloud preset without credentials and preserves existing c
 
 test('upstream update is rejected before extraction or child execution', () => {
   const home = join(scratch, 'rejected-update');
-  const result = run(['update'], { home });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /replacing the wrapper executable/);
-  assert.deepEqual(result.actualArgs, []);
-  assert.equal(existsSync(home), false);
+  for (const args of [['update'], ['--response-setup', 'update'], ['--response-session-key', 'update']]) {
+    const result = run(args, { home });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /replacing the wrapper executable/);
+    assert.deepEqual(result.actualArgs, []);
+    assert.equal(existsSync(home), false);
+  }
 });

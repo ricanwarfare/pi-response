@@ -276,6 +276,7 @@ internal static class Program
                 forwarded.Add(arg);
                 if (arg == "--") literal = true;
             }
+            if (forwarded.Count > 0 && forwarded[0] == "update") throw new IOException("Pi Response updates by replacing the wrapper executable. Upstream self-update is disabled because the embedded runtime is checksum-pinned.");
             if (info)
             {
                 Console.WriteLine("Pi Response " + BuildInfo.Version + " / Windows x64\nPayload SHA256: " + BuildInfo.PayloadHash + "\nPortable home: " + home);

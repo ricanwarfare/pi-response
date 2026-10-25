@@ -99,7 +99,7 @@ To update this package, review the exact npm release and source, verify the down
 
 Investigate checksum mismatches rather than bypassing validation.
 
-The prepared 0.7.2 source incorporates the provenance-only [PR #1](https://github.com/ricanwarfare/pi-response/pull/1) and the [Pi 1.3.0 compatibility review](PI_1.3.0_REVIEW.md). Run `node tests/session-tools-smoke.mjs` after building on each platform to verify persisted tool selection against the actual packaged Pi. This preparation does not publish a release.
+The prepared 0.7.3 source updates Pi to 1.4.0 and incorporates the unpublished 0.7.2 session-tool/provenance changes. See the [Pi 1.4.0 compatibility review](PI_1.4.0_REVIEW.md). After building on each platform, run the existing runtime suites, `node tests/session-tools-smoke.mjs`, and `node tests/compaction-smoke.mjs`. Run `tests/runtime-smoke.mjs` again with `PI_RESPONSE_TEST_CUSTOM_PROVIDER=1` to exercise a separate internal-compatible provider. These tests use synthetic localhost endpoints, not real credentials or enterprise TLS. Upstream self-update is rejected; replace the wrapper executable to upgrade. This preparation does not publish a release.
 
 ## Publish a release
 

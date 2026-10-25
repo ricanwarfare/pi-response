@@ -41,7 +41,7 @@ Local checks in the Linux review environment:
 - The Linux terminal integration and offline collection checks were not fully green locally. Repeated execution intermittently created unexpected hidden executable files beside Pi, correctly rejected by runtime integrity checks; the session suite passed on retry. The cause is unconfirmed. Do not weaken runtime verification or count retries as a full matrix pass. Confirm behavior in clean Ubuntu CI.
 - Windows compilation, signing validation and release-note generation require Windows/PowerShell CI; they were not run locally.
 
-All checks must pass on the final amended commit, including both Ubuntu targets and Windows. Prior-head success does not cover these changes.
+Both clean Ubuntu jobs passed on amended commit `3f72dc062919741bc4c00e3f8c0aa31d0770c5f4` in [CI run 40244881981](https://github.com/ricanwarfare/pi-response/actions/runs/40244881981), including terminal, collection, custom-provider, compaction and session-tool checks. The local hidden-file failures were not reproduced there. This supports an environment-specific explanation but does not establish the cause. All checks must pass again on the final amended commit, including Windows; prior-head success does not cover follow-up changes.
 
 ## Remaining target-machine checks
 
