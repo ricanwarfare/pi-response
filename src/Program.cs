@@ -249,6 +249,7 @@ internal static class Program
     {
         try
         {
+            if (args.Length > 0 && args[0] == "update") throw new IOException("Pi Response updates by replacing the wrapper executable. Upstream self-update is disabled because the embedded runtime is checksum-pinned.");
             var collectOnly = args.Length == 1 && args[0] == "--response-triage";
             if (Array.IndexOf(args, "--") < 0 && Array.IndexOf(args, "--response-triage") >= 0 && !collectOnly) throw new IOException("Use --response-triage by itself. For labeled collection use /triage inside Pi.");
             if (collectOnly) args = new[] { "--no-session", "--print", "/triage" };

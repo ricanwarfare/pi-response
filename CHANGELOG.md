@@ -4,7 +4,17 @@ Wrapper versions are independent of upstream Pi versions.
 
 ## Unreleased
 
+## 0.7.3 — prepared, unpublished
+
 - Update bundled Pi from 1.3.0 to 1.4.0; retain portable launchers, IR tools, provider settings, and web controls.
+
+- Reject upstream self-update before runtime preparation on both platforms; upgrade by replacing the wrapper executable.
+- Make updater fixtures independent of current production pins and documentation; retain same-version asset replacement protection.
+- Exercise regex searches with an ambient ripgrep configuration in packaged-runtime CI.
+- Includes the previously unpublished 0.7.2 session-tool restoration and release-provenance changes described below. Existing configurations are preserved; search-tool and pi-web-search pins are unchanged.
+- Pi 1.4.0 summaries use configured model output limits; review custom endpoint limits.
+
+No merge, tag, or publication is part of this preparation. Restricted Windows/internal TLS and live-provider validation remain outstanding.
 
 ## 0.7.2 — prepared, unpublished
 

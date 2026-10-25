@@ -220,3 +220,12 @@ test('seeds the Ollama Cloud preset without credentials and preserves existing c
   assert.equal(readFileSync(modelsPath, 'utf8'), customModels);
   assert.equal(readFileSync(settingsPath, 'utf8'), customSettings);
 });
+
+test('upstream update is rejected before extraction or child execution', () => {
+  const home = join(scratch, 'rejected-update');
+  const result = run(['update'], { home });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /replacing the wrapper executable/);
+  assert.deepEqual(result.actualArgs, []);
+  assert.equal(existsSync(home), false);
+});

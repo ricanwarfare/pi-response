@@ -180,3 +180,15 @@ func TestEnvironmentAndLock(t *testing.T) {
 		t.Fatal("portable environment not applied")
 	}
 }
+
+func TestUpdateRejectedBeforePreparation(t *testing.T) {
+	home := filepath.Join(t.TempDir(), "untouched")
+	t.Setenv("PI_RESPONSE_HOME", home)
+	err := run([]string{"update"})
+	if err == nil || !strings.Contains(err.Error(), "replacing the wrapper executable") {
+		t.Fatalf("expected portable update refusal, got %v", err)
+	}
+	if _, err := os.Stat(home); !os.IsNotExist(err) {
+		t.Fatal("update must not prepare a portable home")
+	}
+}

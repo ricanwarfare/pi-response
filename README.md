@@ -275,7 +275,7 @@ For a local/private endpoint, add it to the portable `agent/models.json` followi
 - **Host trust:** integrity checks detect changed expected runtime files. They cannot establish trust in a compromised host or stop a privileged attacker changing files after verification.
 - **Automatic discovery:** normal launches disable project approval, AGENTS.md/CLAUDE.md discovery, extension/skill discovery, prompt templates, custom themes, and MCP. The bundled IR and web adapters are loaded explicitly; additional explicit extension/skill paths can still load code or instructions.
 - **Network behavior:** startup network operations and telemetry are disabled. Inference and explicitly invoked commands can still use the network. Pi's `--offline` flag does not make cloud inference work offline.
-- **Subcommands:** upstream commands such as `auth`, `install`, and `update` run directly with the portable environment; normal agent-launch flags are not prepended.
+- **Subcommands:** upstream commands such as `auth` and `install` run directly with the portable environment; normal agent-launch flags are not prepended.
 
 ## Compatibility and release status
 
@@ -287,9 +287,9 @@ For a local/private endpoint, add it to the portable `agent/models.json` followi
 | Upstream Pi | 1.4.0 |
 | Search tools | ripgrep 15.2.0, fd 10.5.0 |
 | Default connection | Ollama Cloud / DeepSeek 4.1 Flash |
-| Wrapper source | 0.7.2 — prepared, unpublished; Pi 1.3.0 session-tool compatibility |
+| Wrapper source | 0.7.3 — prepared, unpublished; Pi 1.4.0 compatibility |
 
-The latest published wrapper is 0.7.1. The 0.7.2 source preparation retains the existing Pi 1.3.0 archive URLs/hashes and adds the release provenance from [PR #1](https://github.com/ricanwarfare/pi-response/pull/1). See the [compatibility review](docs/PI_1.3.0_REVIEW.md) for session tools, provider changes, and sharing behavior.
+The latest published wrapper is 0.7.1. The unpublished 0.7.3 preparation updates Pi to 1.4.0 and includes the unpublished 0.7.2 session-tool and provenance changes from [PR #1](https://github.com/ricanwarfare/pi-response/pull/1). See the [Pi 1.4.0 review](docs/PI_1.4.0_REVIEW.md) and earlier [session-tool review](docs/PI_1.3.0_REVIEW.md).
 
 Automated tests cover both launchers and actual tools using a local fake model, including default model selection and saved-key Bearer authentication. Linux tests also exercise a real pseudo-terminal for hidden input, replacement, and cancellation. No real provider account is used. Live Ollama account access and broader interactive TUI behavior still need validation. ARM64, macOS, and older operating systems are not validated targets.
 
@@ -300,6 +300,10 @@ The [repository review](docs/REVIEW.md) records fixes, verification scope, remai
 The strongest next extension candidates are **RPIV investigation checklists** and **structured analyst questions**, after portable configuration isolation and Windows/Linux runtime tests. Larger subagent, permission, telemetry, and MCP frameworks need separate evaluation; download counts alone do not justify enabling them on an investigated host. Native Pi already has MCP support, deliberately disabled by this launcher's ordinary defaults.
 
 The next built-in features worth prioritizing are a local readiness check, verified single-case export/import that excludes keys and unrelated sessions, and a case/coverage status display. These are proposals, not current commands.
+
+Upstream `update` is rejected before runtime extraction. Upgrade Pi Response by replacing the wrapper executable; existing portable configuration is preserved. Runtime files are checksum-pinned and must not be modified in place.
+
+Pi 1.4.0 summaries use the configured model output limit; `compaction.reserveTokens` controls when compaction starts, not summary output. Set custom models’ `maxTokens` to the endpoint’s supported limit. See the [Pi 1.4.0 review](docs/PI_1.4.0_REVIEW.md) for validation and remaining restricted-Windows checks.
 
 ## Build, update, and contribute
 

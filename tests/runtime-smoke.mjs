@@ -7,6 +7,9 @@ import { resolve, join } from 'node:path';
 // A local fake model requests actual tools; no provider account, key, or paid tokens.
 const root = resolve(import.meta.dirname, '..');
 const linux = process.platform === 'linux';
+const custom = process.env.PI_RESPONSE_TEST_CUSTOM_PROVIDER === '1';
+const provider = custom ? 'internal-test' : 'ollama-cloud';
+const model = custom ? 'internal-model' : 'deepseek-v4.1-flash';
 const scratch = await mkdtemp(join(root, '.build/runtime smoke '));
 const home = join(scratch, 'portable home');
 await mkdir(join(home, 'agent'), { recursive: true });
@@ -18,10 +21,11 @@ await writeFile(join(scratch, '.pi/extensions/hostile.ts'), 'throw new Error("UN
 const calls = [
   linux ? ['bash', { command: "printf 'PORTABLE_BASH_OK\\n'" }, 'PORTABLE_BASH_OK'] : ['powershell', { command: "[Console]::WriteLine('PORTABLE_POWERSHELL_OK')" }, 'PORTABLE_POWERSHELL_OK'],
   ['read', { path: 'evidence.txt' }, 'PORTABLE_EVIDENCE_MARKER'],
-  ['grep', { pattern: 'PORTABLE_EVIDENCE_MARKER', path: 'evidence.txt' }, 'PORTABLE_EVIDENCE_MARKER'],
+  ['grep', { pattern: 'PORTABLE_EVIDENCE_.*', path: 'evidence.txt' }, 'PORTABLE_EVIDENCE_MARKER'],
   ['find', { pattern: '*.txt', path: '.' }, 'evidence.txt'],
   ['ls', { path: '.' }, 'evidence.txt'],
 ];
+await writeFile(join(scratch, 'rg.conf'), '--fixed-strings\n');
 let requests = 0;
 let serverError;
 const server = createServer(async (req, res) => {
@@ -31,7 +35,8 @@ const server = createServer(async (req, res) => {
     let text = ''; for await (const chunk of req) text += chunk;
     const body = JSON.parse(text);
     assert.equal(req.headers.authorization, 'Bearer local-test');
-    assert.equal(body.model, 'deepseek-v4.1-flash');
+    assert.equal(body.model, model);
+    for (const header of ['http-referer', 'x-title', 'x-opencode-client']) assert.equal(req.headers[header], undefined);
     assert.ok(!('store' in body));
     assert.ok(!('max_completion_tokens' in body));
     assert.ok(body.messages.every(message => message.role !== 'developer'));
@@ -60,13 +65,24 @@ await new Promise(resolveListen => server.listen(0, '127.0.0.1', resolveListen))
 try {
   // Use the shipped preset, changing only its URL to the fake local service.
   const preset = JSON.parse(await readFile(join(root, 'config/models.json'), 'utf8'));
-  preset.providers['ollama-cloud'].baseUrl = `http://127.0.0.1:${server.address().port}/v1`;
-  await writeFile(join(home, 'agent/models.json'), JSON.stringify(preset));
+  preset.providers[provider] = preset.providers['ollama-cloud'];
+  if (custom) {
+    delete preset.providers['ollama-cloud'];
+    preset.providers[provider].models[0].id = model;
+    preset.providers[provider].apiKey = '${PI_RESPONSE_TEST_API_KEY}';
+  }
+  preset.providers[provider].baseUrl = `http://127.0.0.1:${server.address().port}/v1`;
+  const modelsBefore = JSON.stringify(preset);
+  await writeFile(join(home, 'agent/models.json'), modelsBefore);
+  const settingsBefore = JSON.stringify({ defaultProvider: provider, defaultModel: model });
+  await writeFile(join(home, 'agent/settings.json'), settingsBefore);
+  await mkdir(join(home, 'runtime', 'previous-payload'), { recursive: true });
+  await writeFile(join(home, 'runtime/previous-payload/sentinel'), 'previous runtime');
   await writeFile(join(home, 'agent/ollama-cloud.key'), 'local-test');
   const windows = process.env.SystemRoot ?? 'C:\\Windows';
-  const child = spawn(join(root, linux ? 'dist/pi-response-linux-x64' : 'dist/pi-response.exe'), ['--print', 'Run the tool smoke test.'], {
+  const child = spawn(join(root, linux ? 'dist/pi-response-linux-x64' : 'dist/pi-response.exe'), [...(custom ? ['--provider', provider, '--model', model] : []), '--print', 'Run the tool smoke test.'], {
     cwd: scratch,
-    env: { ...process.env, OLLAMA_API_KEY: '', PI_RESPONSE_HOME: home, PATH: linux ? '/usr/bin:/bin' : [join(windows, 'System32'), windows, join(windows, 'System32/WindowsPowerShell/v1.0')].join(';') },
+    env: { ...process.env, OLLAMA_API_KEY: '', PI_RESPONSE_TEST_API_KEY: 'local-test', RIPGREP_CONFIG_PATH: join(scratch, 'rg.conf'), PI_RESPONSE_HOME: home, PATH: linux ? '/usr/bin:/bin' : [join(windows, 'System32'), windows, join(windows, 'System32/WindowsPowerShell/v1.0')].join(';') },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let stdout = '', stderr = '';
@@ -85,6 +101,11 @@ try {
   assert.ok(sessionProjects.length > 0, 'session must be saved under portable home');
   const savedModels = await readFile(join(home, 'agent/models.json'), 'utf8');
   assert.ok(!savedModels.includes('local-test'), 'key must not be saved to config');
-  console.log(`PASS: Ollama Cloud preset, default DeepSeek 4.1 selection, saved-key Bearer authentication, ${linux ? 'Bash' : 'PowerShell'}, read, grep, find, ls; portable sessions; disabled workspace discovery; system-only PATH.`);
+  assert.equal(savedModels, modelsBefore);
+  assert.equal(await readFile(join(home, 'agent/settings.json'), 'utf8'), settingsBefore);
+  assert.equal(await readFile(join(home, 'runtime/previous-payload/sentinel'), 'utf8'), 'previous runtime');
+  assert.ok((await readdir(join(home, 'runtime'))).some(name => /^[a-f0-9]{64}$/.test(name)));
+  console.log(`PASS: ${provider}/${model}; attribution opt-out, existing config preservation, old runtime preserved, new hash runtime.`);
+  console.log(`PASS: ${custom ? 'custom provider and environment-key authentication' : 'Ollama Cloud preset, default DeepSeek 4.1 selection, saved-key Bearer authentication'}, ${linux ? 'Bash' : 'PowerShell'}, read, grep, find, ls; portable sessions; disabled workspace discovery; system-only PATH.`);
   console.log(`Test artifacts: ${scratch}`);
 } finally { server.closeAllConnections(); await new Promise(resolveClose => server.close(resolveClose)); }

@@ -507,6 +507,9 @@ func environment(runtime, agent, home, cloudKey, version, upstreamVersion string
 }
 
 func run(args []string) error {
+	if len(args) > 0 && args[0] == "update" {
+		return errors.New("Pi Response updates by replacing the wrapper executable. Upstream self-update is disabled because the embedded runtime is checksum-pinned.")
+	}
 	collectOnly := len(args) == 1 && args[0] == "--response-triage"
 	for _, arg := range args {
 		if arg == "--" {
