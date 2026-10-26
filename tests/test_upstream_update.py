@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import subprocess
+import shutil
 import unittest
 from unittest.mock import patch
 
@@ -30,14 +31,19 @@ class UpdateTests(unittest.TestCase):
     def setUp(self):
         (ROOT / '.build').mkdir(exist_ok=True)
         self.root = Path(tempfile.mkdtemp(prefix='pi-updater-', dir=ROOT / '.build'))
-        for file in [*updater.PIN_FILES.values(), 'README.md', 'THIRD_PARTY_NOTICES.md', 'CHANGELOG.md']:
-            (self.root / file).write_bytes((ROOT / file).read_bytes())
+        self.addCleanup(shutil.rmtree, self.root)
         data, _ = release('1.3.0')
         _, assets = updater.release_assets(data)
         for name, file in updater.PIN_FILES.items():
-            pin = json.loads((self.root / file).read_text())
-            pin['sha256'] = assets[name]['digest'][7:]
+            pin = json.loads((ROOT / file).read_text())
+            pin.update(version='1.3.0',
+                       url=assets[name]['browser_download_url'],
+                       sha256=assets[name]['digest'][7:])
+            pin.pop('release', None)
             (self.root / file).write_text(json.dumps(pin))
+        (self.root / 'README.md').write_text('| Upstream Pi | 1.3.0 |\n')
+        (self.root / 'THIRD_PARTY_NOTICES.md').write_text('| Pi coding agent | 1.3.0 | fixture | MIT |\n')
+        (self.root / 'CHANGELOG.md').write_text('Wrapper versions are independent of upstream Pi versions.\n\n## Unreleased\n')
 
     def test_update_preserves_tools_and_changes_only_expected_files(self):
         old = json.loads((self.root / 'upstream-release.json').read_text())

@@ -56,10 +56,23 @@ try {
   const sessionId = JSON.parse((await readFile(session, 'utf8')).split('\n')[0]).id;
   await run(['--continue'], ['read', 'ls']);
   await run(['--session-id', sessionId], ['read', 'ls']);
+  const older = join(scratch, 'older-session.jsonl');
+  await writeFile(older, await readFile(session));
   await run(['--session', session, '--tools', '+grep,-ls'], ['read', 'grep']);
   await run(['--fork', session], ['read', 'grep']);
   await run(['--session', session, '--tools', 'read'], ['read']);
   await run(['--session', session, '--no-tools'], []);
+  // Introduce an extension after the session recorded its original loadout.
+  const extension = join(scratch, 'new-tools.mjs');
+  await writeFile(extension, `export default function(pi) {
+    for (const [name, defaultActive] of [['new_active', true], ['new_inactive', false]]) {
+      pi.registerTool({ name, label: name, description: 'Synthetic regression tool', defaultActive,
+        parameters: { type: 'object', properties: {} },
+        execute: async () => ({ content: [{ type: 'text', text: 'synthetic' }], details: {} }) });
+    }
+  }`);
+  await run(['--fork', older, '--extension', extension], ['read', 'ls', 'new_active']);
+  await run(['--fork', older, '--extension', extension, '--tools', 'read'], ['read']);
   console.log('PASS: resumed and forked tools, relative adjustments, explicit allowlist/no-tools, web off after resume.');
 } finally {
   await new Promise(done => server.close(done));

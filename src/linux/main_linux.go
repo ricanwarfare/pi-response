@@ -507,6 +507,9 @@ func environment(runtime, agent, home, cloudKey, version, upstreamVersion string
 }
 
 func run(args []string) error {
+	if len(args) > 0 && args[0] == "update" {
+		return errors.New("Pi Response updates by replacing the wrapper executable. Upstream self-update is disabled because the embedded runtime is checksum-pinned.")
+	}
 	collectOnly := len(args) == 1 && args[0] == "--response-triage"
 	for _, arg := range args {
 		if arg == "--" {
@@ -568,6 +571,9 @@ func run(args []string) error {
 		if arg == "--" {
 			literal = true
 		}
+	}
+	if len(forwarded) > 0 && forwarded[0] == "update" {
+		return errors.New("Pi Response updates by replacing the wrapper executable. Upstream self-update is disabled because the embedded runtime is checksum-pinned.")
 	}
 	if info {
 		fmt.Printf("Pi Response %s / Linux x64\nPayload SHA256: %s\nPortable home: %s\nCloud preset: Ollama Cloud; first interactive launch prompts for a key and storage choice. --response-session-key prompts without saving.\n", meta.Version, meta.PayloadSHA256, home)

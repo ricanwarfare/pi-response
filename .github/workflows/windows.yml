@@ -58,6 +58,12 @@ jobs:
       - name: Actual runtime and tool smoke test
         shell: pwsh
         run: node tests/runtime-smoke.mjs
+      - name: Custom internal-compatible provider and portable upgrade smoke test
+        run: node tests/runtime-smoke.mjs
+        env:
+          PI_RESPONSE_TEST_CUSTOM_PROVIDER: '1'
+      - name: Custom-provider compaction smoke test
+        run: node tests/compaction-smoke.mjs
       - name: Session tool compatibility smoke test
         run: node tests/session-tools-smoke.mjs
       - name: Upload tested release files
@@ -105,6 +111,12 @@ jobs:
         run: node tests/triage-analysis-smoke.mjs
       - name: Actual Linux runtime and tool smoke test
         run: node tests/runtime-smoke.mjs
+      - name: Custom internal-compatible provider and portable upgrade smoke test
+        run: node tests/runtime-smoke.mjs
+        env:
+          PI_RESPONSE_TEST_CUSTOM_PROVIDER: '1'
+      - name: Custom-provider compaction smoke test
+        run: node tests/compaction-smoke.mjs
       - name: Session tool compatibility smoke test
         run: node tests/session-tools-smoke.mjs
       - name: Upload tested Linux release files
