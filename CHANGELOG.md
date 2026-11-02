@@ -4,6 +4,8 @@ Wrapper versions are independent of upstream Pi versions.
 
 ## Unreleased
 
+- Update bundled Pi from 1.4.0 to 1.5.0; retain portable launchers, IR tools, provider settings, and web controls.
+
 ## 0.7.3 — prepared, unpublished
 
 - Update bundled Pi from 1.3.0 to 1.4.0; retain portable launchers, IR tools, provider settings, and web controls.
