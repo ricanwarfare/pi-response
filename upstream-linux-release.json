@@ -1,7 +1,7 @@
 {
-  "version": "1.4.0",
-  "url": "https://github.com/earendil-works/pi/releases/download/v1.4.0/pi-linux-x64.tar.gz",
-  "sha256": "f2e4e4329603223d03260cdb8bd5033dbdc1f73ba58ab8939db2e56546e115d2",
+  "version": "1.5.0",
+  "url": "https://github.com/earendil-works/pi/releases/download/v1.5.0/pi-linux-x64.tar.gz",
+  "sha256": "df870ba0e344cb7b3358d8d8f19397b8b8d225a8669784736ad68a5c2169d53b",
   "tools": [
     {
       "name": "rg",
@@ -15,8 +15,8 @@
     }
   ],
   "release": {
-    "id": 420119608,
-    "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0",
-    "publishedAt": "2026-10-21T22:49:48Z"
+    "id": 431339585,
+    "url": "https://github.com/earendil-works/pi/releases/tag/v1.5.0",
+    "publishedAt": "2026-11-02T11:05:31Z"
   }
 }
